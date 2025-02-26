@@ -7,6 +7,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenConnectV1", "OpenConnec
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenConnectV1Tests", "OpenConnectV1Tests\OpenConnectV1Tests.vcxproj", "{F0AB7E5A-6970-4242-AFDB-9AA9304DF8F0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenConnectV1App", "OpenConnectV1App\OpenConnectV1App.vcxproj", "{633071CF-C9F0-4E49-8211-F607D5E163F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0CFF23AE-BD18-4EE1-91C3-5B8B9B6572DB}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +38,14 @@ Global
 		{F0AB7E5A-6970-4242-AFDB-9AA9304DF8F0}.Release|x64.Build.0 = Release|x64
 		{F0AB7E5A-6970-4242-AFDB-9AA9304DF8F0}.Release|x86.ActiveCfg = Release|Win32
 		{F0AB7E5A-6970-4242-AFDB-9AA9304DF8F0}.Release|x86.Build.0 = Release|Win32
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Debug|x64.ActiveCfg = Debug|x64
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Debug|x64.Build.0 = Debug|x64
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Debug|x86.ActiveCfg = Debug|Win32
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Debug|x86.Build.0 = Debug|Win32
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Release|x64.ActiveCfg = Release|x64
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Release|x64.Build.0 = Release|x64
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Release|x86.ActiveCfg = Release|Win32
+		{633071CF-C9F0-4E49-8211-F607D5E163F7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

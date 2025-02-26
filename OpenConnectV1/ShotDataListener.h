@@ -3,10 +3,13 @@
 
 #include "Data.h"
 
-class ShotDataListener {
-public:
-    virtual ~ShotDataListener() = default;
-    virtual void onShotDataReceived(const OpenConnectV1::ShotData& shotData) = 0;
-};
+namespace OpenConnectV1 {
+    class ShotDataListener {
+    public:
+        virtual ~ShotDataListener() = default;
+        virtual void onShotDataReceived(const OpenConnectV1::ShotData& shotData) = 0;
+    };
+
+}
 
 #endif

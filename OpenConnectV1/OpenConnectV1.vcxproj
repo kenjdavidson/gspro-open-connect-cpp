@@ -142,7 +142,6 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Server.cpp" />
-    <ClCompile Include="OpenConnectV1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

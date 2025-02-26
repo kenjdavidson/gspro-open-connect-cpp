@@ -13,16 +13,16 @@ namespace OpenConnectV1 {
 		this->clientAddress = SOCKADDR_IN();
 		this->listener = nullptr;
 
-		Logger::debug("Initializing Winsock; should get a popup asking for access to the network...\n");
+		Logger::debug("Initializing Winsock; should get a popup asking for access to the network...");
 		int startupResult = WSAStartup(MAKEWORD(2, 2), &this->wsaData);
 		if (startupResult != 0) {
-			Logger::debug("Failed to initialized WSAStartup, due to: %d\n", WSAGetLastError());
+			Logger::debug("Failed to initialized WSAStartup, due to: %d", WSAGetLastError());
 			throw "WSAStartup failed!!";
 		}
 	}
 
 	Server::~Server() {
-		Logger::debug("Cleaning up Server and shutting down Winsock.\n");
+		Logger::debug("Cleaning up Server and shutting down Winsock.");
 
 		this->cleanup();
 		WSACleanup();
@@ -33,10 +33,10 @@ namespace OpenConnectV1 {
 	}
 
 	void Server::startup() {
-		Logger::debug("Creating listening socket and waiting for connection(s)...\n");		
+		Logger::debug("Creating listening socket and waiting for connection(s)...");		
 		this->listenSocket = socket(AF_INET, SOCK_STREAM, 0);
 		if (this->listenSocket == INVALID_SOCKET) {
-			Logger::debug("Error at socket(): %ld\n", WSAGetLastError());
+			Logger::debug("Error at socket(): %ld", WSAGetLastError());
 			this->cleanup();
 			throw "Error attempting to create socket, please restart acceptConnections";
 		}
@@ -46,19 +46,19 @@ namespace OpenConnectV1 {
 		this->serverAddress.sin_port = htons(this->port);
 
 		// Setup the TCP listening Socket
-		Logger::debug("Attempting to bind to socket...\n");
+		Logger::debug("Attempting to bind to socket...");
 		auto bindResult = bind(this->listenSocket, reinterpret_cast<SOCKADDR*>(&this->serverAddress), sizeof(this->serverAddress));
 		if (bindResult == SOCKET_ERROR) {
-			Logger::error("bind failed with error: %d\n", WSAGetLastError());
+			Logger::error("bind failed with error: %d", WSAGetLastError());
 			this->cleanup();
 			throw "Error attempting to bind socket, please restart acceptConnections";
 		}
 
 		// Listening on the socket
-		Logger::debug("Start listening on the requested port: %d...\n", this->port);
+		Logger::debug("Start listening on the requested port: %d...", this->port);
 		auto listenResult = listen(this->listenSocket, 0);
 		if (listenResult == SOCKET_ERROR) {
-			Logger::error("Listen failed with error: %ld\n", WSAGetLastError());
+			Logger::error("Listen failed with error: %ld", WSAGetLastError());
 			this->cleanup();
 			throw "Error attempting to listen on socket, please restart acceptConnections";
 		}
@@ -68,7 +68,7 @@ namespace OpenConnectV1 {
 		// then it will continue to look for a new request.
 		int clientSocketSize = sizeof(this->clientAddress);
 		while (!this->shutdownRequested) {
-			Logger::debug("Attempting to accept client connection...\n");
+			Logger::debug("Attempting to accept client connection...");
 			this->connectionStatus = OpenConnectV1::ServerStatus::Listening;
 			this->clientSocket = accept(this->listenSocket, reinterpret_cast<SOCKADDR*>(&this->clientAddress), &clientSocketSize);
 			if (this->clientSocket == INVALID_SOCKET) {
@@ -76,8 +76,8 @@ namespace OpenConnectV1 {
 					break;
 				}
 
-				Logger::error("Accepting connection failed with error: %d\n", WSAGetLastError());
-				Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-accept \n");
+				Logger::error("Accepting connection failed with error: %d", WSAGetLastError());
+				Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-accept ");
 			}
 
 			this->connectionStatus = OpenConnectV1::ServerStatus::Connected;
@@ -88,7 +88,7 @@ namespace OpenConnectV1 {
 			while (!this->shutdownRequested) {
 				int bytesReceived = recv(this->clientSocket, buffer, BUFFER_SIZE, 0);
 				if (bytesReceived > 0) {
-					Logger::debug("Raw data: %s\n", buffer);
+					Logger::debug("Raw data: %s", buffer);
 					try {
 						std::string jsonStr(buffer, bytesReceived);
 						json j = json::parse(jsonStr);  
@@ -96,21 +96,22 @@ namespace OpenConnectV1 {
 						ShotData::from_json(j, shotData);
 						this->notify(shotData);
 
-						Logger::debug("From Launch Monitor: ShotDataOptions\n");
-						Logger::debug("ContainsBallData: %s\n", shotData.ShotDataOptions.ContainsBallData ? "true" : "false");
-						Logger::debug("ContainsClubData: %s\n", shotData.ShotDataOptions.ContainsClubData ? "true" : "false");
-						Logger::debug("LaunchMonitorIsReady: %s\n", shotData.ShotDataOptions.LaunchMonitorIsReady ? "true" : "false");
-						Logger::debug("LaunchMonitorBallDetected: %s\n", shotData.ShotDataOptions.LaunchMonitorBallDetected ? "true" : "false");
-						Logger::debug("IsHeartBeat: %s\n", shotData.ShotDataOptions.IsHeartBeat ? "true" : "false");
+						Logger::debug("Raw: %s", jsonStr.c_str());
+						Logger::debug("From Launch Monitor: ShotDataOptions");
+						Logger::debug("ContainsBallData: %s", shotData.ShotDataOptions.ContainsBallData ? "true" : "false");
+						Logger::debug("ContainsClubData: %s", shotData.ShotDataOptions.ContainsClubData ? "true" : "false");
+						Logger::debug("LaunchMonitorIsReady: %s", shotData.ShotDataOptions.LaunchMonitorIsReady ? "true" : "false");
+						Logger::debug("LaunchMonitorBallDetected: %s", shotData.ShotDataOptions.LaunchMonitorBallDetected ? "true" : "false");
+						Logger::debug("IsHeartBeat: %s", shotData.ShotDataOptions.IsHeartBeat ? "true" : "false");
 					}
 					catch (const std::exception& e) {
-						Logger::error("Failed to deserialize ShotData: %s\n", e.what());
+						Logger::error("Failed to deserialize ShotData: %s", e.what());
 					}
 
 					memset(buffer, 0, BUFFER_SIZE);
 				} else if(!this->shutdownRequested) {
-					Logger::error("Client disconnect or error: %d\n", WSAGetLastError());
-					Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-recv \n");
+					Logger::error("Client disconnect or error: %d", WSAGetLastError());
+					Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-recv ");
 					break;
 				}
 			}
@@ -170,10 +171,10 @@ namespace OpenConnectV1 {
 			int bytesSent = send(clientSocket, jsonStr.c_str(), jsonStr.length(), 0);
 
 			if (bytesSent < 0) {
-				Logger::debug("Unable to send response to monitor/client: %d\n", WSAGetLastError());
-				Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send \n");
+				Logger::debug("Unable to send response to monitor/client: %d", WSAGetLastError());
+				Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send ");
 			} else {
-				Logger::debug("Write was successful: %d of %d bytes sent\n", bytesSent, sizeof(jsonStr));
+				Logger::debug("Write was successful: %d of %d bytes sent", bytesSent, sizeof(jsonStr));
 			}
 		} else {
 			Logger::debug("Client is not connected!");			

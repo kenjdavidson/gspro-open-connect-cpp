@@ -6,7 +6,7 @@
 
 using Logger = OpenConnectV1::Logger;
 
-class ShotDataListenerImpl : public ShotDataListener {
+class ShotDataListenerImpl : public OpenConnectV1::ShotDataListener {
 public:
     void onShotDataReceived(const OpenConnectV1::ShotData& shotData) override {
         // This is where we'd do whatever we need to with the shot data, it will most likely

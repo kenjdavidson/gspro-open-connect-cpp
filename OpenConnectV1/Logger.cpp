@@ -1,17 +1,19 @@
-#include "Logger.h"
 #include <cstdarg>
+#include <iomanip>
+
+#include "Logger.h"
 
 namespace OpenConnectV1 {
     // Define the static member variable
-    LogLevel Logger::minLogLevel = LogLevel::Info;  // Default value
+    LogLevel Logger::minLogLevel = LogLevel::Info;
 
     // LogLevel helper functions
     const char* Logger::logLevelToString(LogLevel level) {
         switch (level) {
-        case LogLevel::Error: return "Error";
-        case LogLevel::Info: return "Info";
-        case LogLevel::Debug: return "Debug";
-        default: return "Unknown";
+        case LogLevel::Error: return "ERROR";
+        case LogLevel::Info: return "INFO";
+        case LogLevel::Debug: return "DEBUG";
+        default: return "UNKNOWN";
         }
     }
 
@@ -26,15 +28,17 @@ namespace OpenConnectV1 {
     void Logger::log(LogLevel level, const char* message, ...) {
         if (level > minLogLevel) return;
 
+        constexpr size_t BUFFER_SIZE = 1024; 
+        char buffer[BUFFER_SIZE];
+
         va_list args;
         va_start(args, message);
+        vsnprintf(buffer, BUFFER_SIZE, message, args);
+        va_end(args);
 
         const char* levelStr = logLevelToString(level);
-        printf("[%s] ", levelStr);
-        vprintf(message, args);
-        printf("\n");
 
-        va_end(args);
+        std::cout << "[" << std::left << std::setw(8) << levelStr << "] " << buffer << std::endl;
     }
 
     void Logger::error(const char* message, ...) {

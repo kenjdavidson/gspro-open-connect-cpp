@@ -8,7 +8,7 @@
 class ShotDataListenerTest : public ::testing::Test {
 protected:
     // Subclass of ShotDataListener for testing purposes
-    class TestShotDataListener : public ShotDataListener {
+    class TestShotDataListener : public OpenConnectV1::ShotDataListener {
     public:
         bool wasCalled = false;  // Flag to track if onShotDataReceived is called
 
