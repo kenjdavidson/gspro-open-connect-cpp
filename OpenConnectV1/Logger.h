@@ -25,7 +25,7 @@ namespace OpenConnectV1 {
         static void debug(const char* message, ...);
 
     private:
-        static void log(LogLevel level, const char* message, ...);
+        static void log(LogLevel level, const char* message, va_list args);
         static const char* logLevelToString(LogLevel level);
         static LogLevel stringToLogLevel(const char* level);
     };

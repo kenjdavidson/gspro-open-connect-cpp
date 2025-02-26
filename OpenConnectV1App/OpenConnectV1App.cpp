@@ -62,6 +62,9 @@ public:
                 // If no slash is present, assume it's a handed-only input
                 handed = input;
             }
+
+            OpenConnectV1::Response response(OpenConnectV1::ResponseCode::PlayerInfo, "GSPro Player Information", OpenConnectV1::PlayerData(handed, club));
+            server.sendResponse(response);
         }
 
         // Gracefully stop the server and join the thread

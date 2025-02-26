@@ -69,6 +69,13 @@ TEST_F(LoggerTest, HandlesStringParameterCorrectly) {
     OpenConnectV1::Logger::info("String: %s", testString.c_str());
 
     std::string logOutput = buffer.str();
+    EXPECT_NE(logOutput.find("[INFO    ] String: This is a test"), std::string::npos);
+}
 
-    EXPECT_NE(logOutput.find("[INFO   ] String: This is a test"), std::string::npos);
+TEST_F(LoggerTest, HandlesIntParameterCorrectly) {
+    int testInt = 921;
+    OpenConnectV1::Logger::info("Int: %d", testInt);
+
+    std::string logOutput = buffer.str();
+    EXPECT_NE(logOutput.find("[INFO    ] Int: 921"), std::string::npos);
 }

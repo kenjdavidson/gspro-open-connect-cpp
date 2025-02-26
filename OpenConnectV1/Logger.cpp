@@ -25,16 +25,13 @@ namespace OpenConnectV1 {
     }
 
     // Implement logging functions
-    void Logger::log(LogLevel level, const char* message, ...) {
+    void Logger::log(LogLevel level, const char* message, va_list args) {
         if (level > minLogLevel) return;
 
         constexpr size_t BUFFER_SIZE = 1024; 
         char buffer[BUFFER_SIZE];
 
-        va_list args;
-        va_start(args, message);
         vsnprintf(buffer, BUFFER_SIZE, message, args);
-        va_end(args);
 
         const char* levelStr = logLevelToString(level);
 
