@@ -9,16 +9,11 @@
 
 #include "Data.h"
 #include "ShotDataListener.h"
+#include "ServerStatus.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
 namespace OpenConnectV1 {
-	enum class ServerStatus {
-		Disconnected = 0,
-		Listening = 1,
-		Connected = 2
-	};
-
 	class Server {
 	public:
 		Server(int port);
@@ -27,9 +22,13 @@ namespace OpenConnectV1 {
 		void startup();
 		void shutdown();
 		void sendResponse(OpenConnectV1::Response& response);
+		
 		ServerStatus getStatus();
-		void addListener(std::shared_ptr<ShotDataListener> listener);
-		void removeListener();
+
+		void addShotDataListener(std::shared_ptr<ShotDataListener> listener);
+		void removeShotDataListener();
+		void addStatusListener(std::shared_ptr<StatusListener> listener);
+		void removeStatusListener();
 
 	private:
 		int port;
@@ -44,10 +43,12 @@ namespace OpenConnectV1 {
 		SOCKET clientSocket = INVALID_SOCKET;
 		SOCKADDR_IN clientAddress;
 
-		std::shared_ptr<ShotDataListener> listener;
+		std::shared_ptr<ShotDataListener> shotDataListener;
+		std::shared_ptr<StatusListener> statusListener;
 		std::mutex listenersMutex;
 
 		void notify(const OpenConnectV1::ShotData& shotData);
+		void changeStatus(const ServerStatus& status);
 		void cleanup();
 	};
 }

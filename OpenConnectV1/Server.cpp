@@ -11,7 +11,7 @@ namespace OpenConnectV1 {
 		this->shutdownRequested = false;
 		this->serverAddress = SOCKADDR_IN();
 		this->clientAddress = SOCKADDR_IN();
-		this->listener = nullptr;
+		this->shotDataListener = nullptr;
 
 		Logger::debug("Initializing Winsock; should get a popup asking for access to the network...");
 		int startupResult = WSAStartup(MAKEWORD(2, 2), &this->wsaData);
@@ -120,21 +120,41 @@ namespace OpenConnectV1 {
 		}
 	}
 
-	void Server::addListener(std::shared_ptr<ShotDataListener> listener) {
-		std::lock_guard<std::mutex> lock(listenersMutex);
-		this->listener = listener;
+	void Server::addShotDataListener(std::shared_ptr<ShotDataListener> listener) {
+		std::lock_guard<std::mutex> lock(this->listenersMutex);
+		this->shotDataListener = listener;
 	}
 
-	void Server::removeListener() {
-		std::lock_guard<std::mutex> lock(listenersMutex);
-		this->listener = nullptr;
+	void Server::removeShotDataListener() {
+		std::lock_guard<std::mutex> lock(this->listenersMutex);
+		this->shotDataListener = nullptr;
+	}
+
+	void Server::addStatusListener(std::shared_ptr<StatusListener> listener) {
+		std::lock_guard<std::mutex> lock(this->listenersMutex);
+		this->statusListener = listener;
+	}
+
+	void Server::removeStatusListener() {
+		std::lock_guard<std::mutex> lock(this->listenersMutex);
+		this->statusListener = nullptr;
 	}
 
 	void Server::notify(const OpenConnectV1::ShotData& shotData) {
-		std::lock_guard<std::mutex> lock(listenersMutex);
-		if (this->listener) {
-			this->listener->onShotDataReceived(shotData);  // Notify each listener
+		std::lock_guard<std::mutex> lock(this->listenersMutex);
+		if (this->shotDataListener) {
+			this->shotDataListener->onShotDataReceived(shotData);  // Notify each listener
 		}
+	}
+
+	void Server::changeStatus(const ServerStatus& status) {
+		std::lock_guard<std::mutex> lock(this->listenersMutex);
+		if (this->connectionStatus != status) {
+			if (this->statusListener) {
+				this->statusListener->onStatusChanged(status); 
+			}
+		}
+
 	}
 
 	void Server::shutdown() {

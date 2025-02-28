@@ -7,7 +7,7 @@
 #include "../OpenConnectV1/ShotDataListener.h"
 #include "../OpenConnectV1/Logger.h"
 
-class ConsoleApp : public OpenConnectV1::ShotDataListener {
+class ConsoleApp : public OpenConnectV1::ShotDataListener, public OpenConnectV1::StatusListener {
 private:
     std::atomic<bool> running{ true };
     OpenConnectV1::Server server;
@@ -27,9 +27,14 @@ public:
         this->server.sendResponse(response);
     }
 
+    void onStatusChanged(OpenConnectV1::ServerStatus status) {
+        OpenConnectV1::Logger::info("Server Status: %s", status);
+    }
+
     void run() {
         std::shared_ptr<ConsoleApp> listener = std::make_shared<ConsoleApp>();
-        this->server.addListener(listener);
+        this->server.addShotDataListener(listener);
+        this->server.addStatusListener(listener);
 
         // Start the server in a separate thread
         std::thread serverThread([&]() {
