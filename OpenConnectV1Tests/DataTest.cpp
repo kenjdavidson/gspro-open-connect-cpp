@@ -35,6 +35,41 @@ TEST(BallDataTest, FromJson) {
     EXPECT_FLOAT_EQ(ballData.CarryDistance, 250.0);
 }
 
+TEST(BallDataTest, FromJsonHandlesNaNValuesAsEmpty) {
+    json j = {
+        {"Speed", 120.5},
+        {"SpinAxis", std::numeric_limits<float>::quiet_NaN()},
+        {"TotalSpin", 2500},
+        {"BackSpin", std::numeric_limits<float>::quiet_NaN()},
+        {"SideSpin", 300},
+        {"HLA", std::numeric_limits<float>::quiet_NaN()},
+        {"VLA", 15.2},
+        {"CarryDistance", 250.7}
+    };
+
+    BallData ballData;
+    BallData::from_json(j, ballData);
+
+    // Check if values exist (not NaN)
+    EXPECT_FALSE(std::isnan(ballData.Speed));
+    EXPECT_FALSE(std::isnan(ballData.TotalSpin));
+    EXPECT_FALSE(std::isnan(ballData.SideSpin));
+    EXPECT_FALSE(std::isnan(ballData.VLA));
+    EXPECT_FALSE(std::isnan(ballData.CarryDistance));
+
+    // Check if values are missing (NaN)
+    EXPECT_TRUE(std::isnan(ballData.SpinAxis));
+    EXPECT_TRUE(std::isnan(ballData.BackSpin));
+    EXPECT_TRUE(std::isnan(ballData.HLA));
+
+    // Compare values
+    EXPECT_FLOAT_EQ(ballData.Speed, 120.5f);
+    EXPECT_FLOAT_EQ(ballData.TotalSpin, 2500.0f);
+    EXPECT_FLOAT_EQ(ballData.SideSpin, 300.0f);
+    EXPECT_FLOAT_EQ(ballData.VLA, 15.2f);
+    EXPECT_FLOAT_EQ(ballData.CarryDistance, 250.7f);
+}
+
 // Test that ClubData can be parsed from JSON
 TEST(ClubDataTest, FromJson) {
     // Create a sample JSON object for ClubData
@@ -65,6 +100,45 @@ TEST(ClubDataTest, FromJson) {
     EXPECT_FLOAT_EQ(clubData.VerticalFaceImpact, 0.2);
     EXPECT_FLOAT_EQ(clubData.HorizontalFaceImpact, 0.1);
     EXPECT_FLOAT_EQ(clubData.ClosureRate, 1.2);
+}
+
+TEST(ClubDataTest, FromJsonHandlesNaNValuesAsEmpty) {
+    json j = {
+        {"Speed", 120.5},
+        {"AngleOfAttack", std::numeric_limits<float>::quiet_NaN()},
+        {"FaceToTarget", 0.5},
+        {"Lie", std::numeric_limits<float>::quiet_NaN()},
+        {"Loft", 15.0},
+        {"Path", std::numeric_limits<float>::quiet_NaN()},
+        {"SpeedAtImpact", 130.2},
+        {"VerticalFaceImpact", std::numeric_limits<float>::quiet_NaN()},
+        {"HorizontalFaceImpact", 0.7},
+        {"ClosureRate", std::numeric_limits<float>::quiet_NaN()}
+    };
+
+    ClubData clubData;
+    ClubData::from_json(j, clubData);
+
+    // Check if values exist (not NaN)
+    EXPECT_FALSE(std::isnan(clubData.Speed));
+    EXPECT_FALSE(std::isnan(clubData.FaceToTarget));
+    EXPECT_FALSE(std::isnan(clubData.Loft));
+    EXPECT_FALSE(std::isnan(clubData.SpeedAtImpact));
+    EXPECT_FALSE(std::isnan(clubData.HorizontalFaceImpact));
+
+    // Check if values are missing (NaN)
+    EXPECT_TRUE(std::isnan(clubData.AngleOfAttack));
+    EXPECT_TRUE(std::isnan(clubData.Lie));
+    EXPECT_TRUE(std::isnan(clubData.Path));
+    EXPECT_TRUE(std::isnan(clubData.VerticalFaceImpact));
+    EXPECT_TRUE(std::isnan(clubData.ClosureRate));
+
+    // Compare values
+    EXPECT_FLOAT_EQ(clubData.Speed, 120.5f);
+    EXPECT_FLOAT_EQ(clubData.FaceToTarget, 0.5f);
+    EXPECT_FLOAT_EQ(clubData.Loft, 15.0f);
+    EXPECT_FLOAT_EQ(clubData.SpeedAtImpact, 130.2f);
+    EXPECT_FLOAT_EQ(clubData.HorizontalFaceImpact, 0.7f);
 }
 
 // Test that ShotDataOptions can be parsed from JSON

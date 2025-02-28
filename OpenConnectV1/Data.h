@@ -12,14 +12,14 @@ using json = nlohmann::json;
  */
 namespace OpenConnectV1 {
     struct BallData {
-        float Speed;
-        float SpinAxis;
-        float TotalSpin;
-        float BackSpin;
-        float SideSpin;
-        float HLA;
-        float VLA;
-        float CarryDistance;
+        float Speed = std::numeric_limits<float>::quiet_NaN();
+        float SpinAxis = std::numeric_limits<float>::quiet_NaN();
+        float TotalSpin = std::numeric_limits<float>::quiet_NaN();
+        float BackSpin = std::numeric_limits<float>::quiet_NaN();
+        float SideSpin = std::numeric_limits<float>::quiet_NaN();
+        float HLA = std::numeric_limits<float>::quiet_NaN();
+        float VLA = std::numeric_limits<float>::quiet_NaN();
+        float CarryDistance = std::numeric_limits<float>::quiet_NaN();
 
         BallData();
         BallData(float speed, float spinAxis, float totalSpin, float backSpin, float sideSpin,
@@ -29,16 +29,16 @@ namespace OpenConnectV1 {
     };
 
     struct ClubData {
-        float Speed;
-        float AngleOfAttack;
-        float FaceToTarget;
-        float Lie;
-        float Loft;
-        float Path;
-        float SpeedAtImpact;
-        float VerticalFaceImpact;
-        float HorizontalFaceImpact;
-        float ClosureRate;
+        float Speed = std::numeric_limits<float>::quiet_NaN();
+        float AngleOfAttack = std::numeric_limits<float>::quiet_NaN();
+        float FaceToTarget = std::numeric_limits<float>::quiet_NaN();
+        float Lie = std::numeric_limits<float>::quiet_NaN();
+        float Loft = std::numeric_limits<float>::quiet_NaN();
+        float Path = std::numeric_limits<float>::quiet_NaN();
+        float SpeedAtImpact = std::numeric_limits<float>::quiet_NaN();
+        float VerticalFaceImpact = std::numeric_limits<float>::quiet_NaN();
+        float HorizontalFaceImpact = std::numeric_limits<float>::quiet_NaN();
+        float ClosureRate = std::numeric_limits<float>::quiet_NaN();
 
         ClubData();
         ClubData(float speed, float angleOfAttack, float faceToTarget, float lie, float loft,

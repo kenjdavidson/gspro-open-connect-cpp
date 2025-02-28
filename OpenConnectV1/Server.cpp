@@ -164,7 +164,7 @@ namespace OpenConnectV1 {
 			}}
 		};
 
-		std::string jsonStr = jsonResponse.dump();
+		std::string jsonStr = jsonResponse.dump() + "\n";
 		Logger::debug("Simulating response to monitor/client: %s", jsonStr.c_str());
 
 		if (this->clientSocket > 0) {
@@ -174,7 +174,7 @@ namespace OpenConnectV1 {
 				Logger::debug("Unable to send response to monitor/client: %d", WSAGetLastError());
 				Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-send ");
 			} else {
-				Logger::debug("Write was successful: %d of %d bytes sent", bytesSent, sizeof(jsonStr));
+				Logger::debug("Write was successful: %d of %d bytes sent", bytesSent, jsonStr.length());
 			}
 		} else {
 			Logger::debug("Client is not connected!");			

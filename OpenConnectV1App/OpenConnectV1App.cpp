@@ -8,8 +8,12 @@
 #include "../OpenConnectV1/Logger.h"
 
 class ConsoleApp : public OpenConnectV1::ShotDataListener {
-public:
+private:
     std::atomic<bool> running{ true };
+    OpenConnectV1::Server server;
+
+public:
+    ConsoleApp() : server(921) {}
 
     void onShotDataReceived(const OpenConnectV1::ShotData& shotData) override {
         std::cout << "Received ShotData:\n"
@@ -18,12 +22,14 @@ public:
             << "ShotNumber: " << shotData.ShotNumber << "\n"
             << "APIversion: " << shotData.APIversion << "\n"
             << std::endl;
+
+        OpenConnectV1::Response response(OpenConnectV1::ResponseCode::OK, "Shot Received", OpenConnectV1::PlayerData("RH", "DR"));
+        this->server.sendResponse(response);
     }
 
     void run() {
-        OpenConnectV1::Server server(921);
         std::shared_ptr<ConsoleApp> listener = std::make_shared<ConsoleApp>();
-        server.addListener(listener);
+        this->server.addListener(listener);
 
         // Start the server in a separate thread
         std::thread serverThread([&]() {

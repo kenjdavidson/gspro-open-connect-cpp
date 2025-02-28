@@ -11,14 +11,22 @@ namespace OpenConnectV1 {
         SideSpin(sideSpin), HLA(hla), VLA(vla), CarryDistance(carryDistance) {}
 
     void BallData::from_json(const json& j, BallData& b) {
-        b.Speed = j["Speed"].get<float>();
-        b.SpinAxis = j["SpinAxis"].get<float>();
-        b.TotalSpin = j["TotalSpin"].get<float>();
-        b.BackSpin = j["BackSpin"].get<float>();
-        b.SideSpin = j["SideSpin"].get<float>();
-        b.HLA = j["HLA"].get<float>();
-        b.VLA = j["VLA"].get<float>();
-        b.CarryDistance = j["CarryDistance"].get<float>();
+        auto safe_get = [](const json& j, const std::string& key) -> float {
+            if (j.contains(key) && j[key].is_number()) {
+                float value = j[key].get<float>();
+                return std::isnan(value) ? std::numeric_limits<float>::quiet_NaN() : value;
+            }
+            return std::numeric_limits<float>::quiet_NaN();  // Use NaN for missing values
+        };
+
+        b.Speed = safe_get(j, "Speed");
+        b.SpinAxis = safe_get(j, "SpinAxis");
+        b.TotalSpin = safe_get(j, "TotalSpin");
+        b.BackSpin = safe_get(j, "BackSpin");
+        b.SideSpin = safe_get(j, "SideSpin");
+        b.HLA = safe_get(j, "HLA");
+        b.VLA = safe_get(j, "VLA");
+        b.CarryDistance = safe_get(j, "CarryDistance");
     }
 
     ClubData::ClubData()
