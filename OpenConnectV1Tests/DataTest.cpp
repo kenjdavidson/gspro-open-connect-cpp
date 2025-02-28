@@ -52,6 +52,7 @@ TEST(BallDataTest, FromJsonHandlesNaNValuesAsEmpty) {
 
     // Check if values exist (not NaN)
     EXPECT_FALSE(std::isnan(ballData.Speed));
+
     EXPECT_FALSE(std::isnan(ballData.TotalSpin));
     EXPECT_FALSE(std::isnan(ballData.SideSpin));
     EXPECT_FALSE(std::isnan(ballData.VLA));

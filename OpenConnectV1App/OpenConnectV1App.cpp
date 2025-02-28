@@ -39,7 +39,7 @@ public:
         // Main loop for user input
         while (true) {
             std::string input;
-            std::cout << "Enter Handed/Club (e.g., RH/9I, LH/3W) or 'Q' to quit: ";
+            std::cout << "Enter Handed/Club (e.g., RH/I9, LH/W3) or 'Q' to quit: ";
             std::cin >> input;
 
             // Handle exit condition
