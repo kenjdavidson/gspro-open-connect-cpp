@@ -6,7 +6,7 @@
 namespace OpenConnectV1 {
     Server::Server(int port)
         : port(port), connectionStatus(ServerStatus::Disconnected), shutdownRequested(false),
-        serverAddress{}, clientAddress{}, shotDataListener(nullptr),
+        serverAddress{}, clientAddress{}, serverListener(nullptr),
         clientSocket(std::make_shared<SOCKET>(INVALID_SOCKET)) {
 
         Logger::debug("Initializing Winsock; should get a popup asking for access to the network...");
@@ -80,7 +80,7 @@ namespace OpenConnectV1 {
         int clientSocketSize = sizeof(this->clientAddress);
         while (!this->shutdownRequested.load()) {
             Logger::debug("Attempting to accept client connection...");
-            this->connectionStatus.store(OpenConnectV1::ServerStatus::Listening);
+            this->notifyStatus(OpenConnectV1::ServerStatus::Listening);
             *this->clientSocket = accept(this->listenSocket, reinterpret_cast<SOCKADDR*>(&this->clientAddress), &clientSocketSize);
             if (*this->clientSocket == INVALID_SOCKET) {
                 if (this->shutdownRequested.load()) {
@@ -91,7 +91,7 @@ namespace OpenConnectV1 {
                 Logger::debug("See: https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-accept ");
                 continue; // Attempt to accept the next connection
             }
-            this->connectionStatus.store(OpenConnectV1::ServerStatus::Connected);
+            this->notifyStatus(OpenConnectV1::ServerStatus::Connected);
             handleClientCommunication();
         }
     }
@@ -109,7 +109,7 @@ namespace OpenConnectV1 {
                     json j = json::parse(jsonStr);
                     ShotData shotData;
                     ShotData::from_json(j, shotData);
-                    this->notify(shotData);
+                    this->notifyShotData(shotData);
 
                     Logger::debug("Raw: %s", jsonStr.c_str());
                     Logger::debug("From Launch Monitor: ShotDataOptions");
@@ -135,45 +135,38 @@ namespace OpenConnectV1 {
         *this->clientSocket = INVALID_SOCKET;
     }
 
-    void Server::addShotDataListener(std::shared_ptr<ShotDataListener> listener) {
+    void Server::setListener(std::shared_ptr<ServerListener> listener) {
         std::lock_guard<std::mutex> lock(this->listenersMutex);
-        this->shotDataListener = listener;
+        this->serverListener = listener;
     }
 
-    void Server::removeShotDataListener() {
+    void Server::removeListener() {
         std::lock_guard<std::mutex> lock(this->listenersMutex);
-        this->shotDataListener = nullptr;
+        this->serverListener.reset();
     }
 
-    void Server::addStatusListener(std::shared_ptr<StatusListener> listener) {
-        std::lock_guard<std::mutex> lock(this->listenersMutex);
-        this->statusListener = listener;
-    }
 
-    void Server::removeStatusListener() {
+    void Server::notifyShotData(const OpenConnectV1::ShotData& shotData) {
         std::lock_guard<std::mutex> lock(this->listenersMutex);
-        this->statusListener = nullptr;
-    }
-
-    void Server::notify(const OpenConnectV1::ShotData& shotData) {
-        std::lock_guard<std::mutex> lock(this->listenersMutex);
-        if (this->shotDataListener) {
-            this->shotDataListener->onShotDataReceived(shotData);  // Notify each listener
+        if (this->serverListener) {
+            this->serverListener->onShotDataReceived(shotData);  // Notify each listener
         }
     }
 
-    void Server::changeStatus(const ServerStatus& status) {
+    void Server::notifyStatus(const ServerStatus& status) {
         std::lock_guard<std::mutex> lock(this->listenersMutex);
+        this->connectionStatus.store(status);
+
         if (this->connectionStatus.load() != status) {
-            if (this->statusListener) {
-                this->statusListener->onStatusChanged(status);
+            if (this->serverListener) {
+                this->serverListener->onStatusChanged(status);
             }
         }
     }
 
     void Server::shutdown() {
         this->shutdownRequested.store(true);
-        this->connectionStatus.store(OpenConnectV1::ServerStatus::Disconnected);
+        this->notifyStatus(OpenConnectV1::ServerStatus::Disconnected);
         this->cleanup();
     }
 
@@ -205,9 +198,6 @@ namespace OpenConnectV1 {
     void Server::sendResponse(OpenConnectV1::Response& response) {
         std::string jsonStr = createJsonResponse(response);
         Logger::debug("Simulating response to monitor/client: %s", jsonStr.c_str());
-
-        // Debug output for clientSocket
-        Logger::debug("clientSocket address: %p, clientSocket value: %d", static_cast<void*>(clientSocket.get()), *clientSocket);
 
         sendJsonResponse(jsonStr);
     }

@@ -1,25 +1,28 @@
 #include "pch.h"
 
 #include <gtest/gtest.h>
+#include "../OpenConnectV1/Server.h"
 #include "../OpenConnectV1/Data.h"
-#include "../OpenConnectV1/ShotDataListener.h"
 
-// Test class for ShotDataListener
 class ShotDataListenerTest : public ::testing::Test {
 protected:
-    // Subclass of ShotDataListener for testing purposes
-    class TestShotDataListener : public OpenConnectV1::ShotDataListener {
+    class TestShotDataListener : public OpenConnectV1::ServerListener {
     public:
-        bool wasCalled = false;  // Flag to track if onShotDataReceived is called
+        bool shotDataCalled = false; 
+        bool statusCalled = false;
 
         void onShotDataReceived(const OpenConnectV1::ShotData& shotData) override {
-            // Set the flag when the method is called
-            wasCalled = true;
-            // Optionally, you could also check the contents of shotData here
+            shotDataCalled = true;
             receivedShotData = shotData;
         }
 
-        OpenConnectV1::ShotData receivedShotData;  // Store the received data for validation
+        void onStatusChanged(const OpenConnectV1::ServerStatus& status) override {
+            statusCalled = true;
+            receivedStatus = status;
+        }
+
+        OpenConnectV1::ShotData receivedShotData;
+        OpenConnectV1::ServerStatus receivedStatus;
     };
 
     TestShotDataListener testListener;  // Instance of the test listener
@@ -68,7 +71,7 @@ TEST_F(ShotDataListenerTest, TestOnShotDataReceived) {
     testListener.onShotDataReceived(mockShotData);
 
     // Check that onShotDataReceived was called
-    EXPECT_TRUE(testListener.wasCalled);
+    EXPECT_TRUE(testListener.shotDataCalled);
 
     // Optionally, check if the receivedShotData matches the mock data
     EXPECT_EQ(testListener.receivedShotData.DeviceID, "TestDevice");

@@ -150,8 +150,6 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Data.h" />
     <ClInclude Include="Server.h" />
-    <ClInclude Include="ServerStatus.h" />
-    <ClInclude Include="ShotDataListener.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,10 +4,9 @@
 #include <sstream>
 #include "../OpenConnectV1/Server.h"
 #include "../OpenConnectV1/Data.h"
-#include "../OpenConnectV1/ShotDataListener.h"
 #include "../OpenConnectV1/Logger.h"
 
-class ConsoleApp : public OpenConnectV1::ShotDataListener, public OpenConnectV1::StatusListener {
+class ConsoleApp : public OpenConnectV1::ServerListener {
 private:
     std::atomic<bool> running{ true };
     OpenConnectV1::Server server;
@@ -27,7 +26,7 @@ public:
         this->server.sendResponse(response);
     }
 
-    void onStatusChanged(OpenConnectV1::ServerStatus status) {
+    void onStatusChanged(const OpenConnectV1::ServerStatus& status) override {
         OpenConnectV1::Logger::info("Server Status: %s", status);
     }
 
@@ -35,8 +34,7 @@ public:
         // This was the super annoying spot that was creating a new ConsoleApp incorrectly.  This needs to use the current
         // instance of the Console app so that things don't go crazy.  MAGIC!!
         std::shared_ptr<ConsoleApp> listener = std::shared_ptr<ConsoleApp>(this, [](ConsoleApp*) {});
-        this->server.addShotDataListener(listener);
-        this->server.addStatusListener(listener);
+        this->server.setListener(listener);
 
         std::thread serverThread([&]() {
             this->server.startup();

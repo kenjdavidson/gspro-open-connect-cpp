@@ -9,12 +9,23 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include "Data.h"
-#include "ShotDataListener.h"
-#include "ServerStatus.h"
 
 #pragma comment(lib, "Ws2_32.lib")
 
 namespace OpenConnectV1 {
+    enum class ServerStatus {
+        Disconnected = 0,
+        Listening = 1,
+        Connected = 2
+    };
+
+    class ServerListener {
+    public:
+        virtual ~ServerListener() = default;
+        virtual void onShotDataReceived(const OpenConnectV1::ShotData& shotData) = 0;
+        virtual void onStatusChanged(const ServerStatus& status) = 0;
+    };
+
     class Server {
     public:
         Server(int port);
@@ -26,10 +37,8 @@ namespace OpenConnectV1 {
 
         ServerStatus getStatus();
 
-        void addShotDataListener(std::shared_ptr<ShotDataListener> listener);
-        void removeShotDataListener();
-        void addStatusListener(std::shared_ptr<StatusListener> listener);
-        void removeStatusListener();
+        void setListener(std::shared_ptr<ServerListener> listener);
+        void removeListener();
 
     private:
         int port;
@@ -44,12 +53,11 @@ namespace OpenConnectV1 {
         std::shared_ptr<SOCKET> clientSocket;
         SOCKADDR_IN clientAddress;
 
-        std::shared_ptr<ShotDataListener> shotDataListener;
-        std::shared_ptr<StatusListener> statusListener;
+        std::shared_ptr<ServerListener> serverListener;
         std::mutex listenersMutex;
 
-        void notify(const OpenConnectV1::ShotData& shotData);
-        void changeStatus(const ServerStatus& status);
+        void notifyShotData(const OpenConnectV1::ShotData& shotData);
+        void notifyStatus(const ServerStatus& status);
         void cleanup();
 
         void initializeSocket();
