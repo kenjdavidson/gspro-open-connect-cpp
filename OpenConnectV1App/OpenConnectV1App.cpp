@@ -23,7 +23,7 @@ public:
             << "APIversion: " << shotData.APIversion << "\n"
             << std::endl;
 
-        OpenConnectV1::Response response(OpenConnectV1::ResponseCode::OK, "Shot Received", OpenConnectV1::PlayerData("RH", "DR"));
+        OpenConnectV1::Response response(OpenConnectV1::ResponseCode::OK, "Within the Listener", OpenConnectV1::PlayerData("RH", "DR"));
         this->server.sendResponse(response);
     }
 
@@ -32,13 +32,14 @@ public:
     }
 
     void run() {
-        std::shared_ptr<ConsoleApp> listener = std::make_shared<ConsoleApp>();
+        // This was the super annoying spot that was creating a new ConsoleApp incorrectly.  This needs to use the current
+        // instance of the Console app so that things don't go crazy.  MAGIC!!
+        std::shared_ptr<ConsoleApp> listener = std::shared_ptr<ConsoleApp>(this, [](ConsoleApp*) {});
         this->server.addShotDataListener(listener);
         this->server.addStatusListener(listener);
 
-        // Start the server in a separate thread
         std::thread serverThread([&]() {
-            server.startup();
+            this->server.startup();
         });
 
         // Main loop for user input
