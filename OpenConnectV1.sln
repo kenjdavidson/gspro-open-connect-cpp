@@ -11,7 +11,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenConnectV1App", "OpenCon
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0CFF23AE-BD18-4EE1-91C3-5B8B9B6572DB}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2A764D47-1ECC-495A-984E-FE14FC58ECB2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{438E8EF9-F368-46D0-ACC7-8D63E2D2B851}"
+	ProjectSection(SolutionItems) = preProject
+		build-and-release.yml = build-and-release.yml
 	EndProjectSection
 EndProject
 Global
@@ -49,6 +57,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2A764D47-1ECC-495A-984E-FE14FC58ECB2} = {0CFF23AE-BD18-4EE1-91C3-5B8B9B6572DB}
+		{438E8EF9-F368-46D0-ACC7-8D63E2D2B851} = {2A764D47-1ECC-495A-984E-FE14FC58ECB2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4878C048-7EAF-4044-A778-8AAC69C924B2}

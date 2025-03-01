@@ -1,0 +1,62 @@
+name: Build and Release OpenConnectV1.lib
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Set up Visual Studio
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Build OpenConnectV1.lib
+      run: msbuild /p:Configuration=Release /p:Platform=x64 OpenConnectV1/OpenConnectV1.vcxproj
+
+    - name: Archive built library
+      uses: actions/upload-artifact@v2
+      with:
+        name: OpenConnectV1.lib
+        path: OpenConnectV1/x64/Release/OpenConnectV1.lib
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download built library
+      uses: actions/download-artifact@v2
+      with:
+        name: OpenConnectV1.lib
+        path: .
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./OpenConnectV1.lib
+        asset_name: OpenConnectV1.lib
+        asset_content_type: application/octet-stream
