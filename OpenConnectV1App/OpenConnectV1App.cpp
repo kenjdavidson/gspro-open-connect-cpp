@@ -12,7 +12,7 @@ private:
     OpenConnectV1::Server server;
 
 public:
-    ConsoleApp() : server(921) {}
+    ConsoleApp() : server() {}
 
     void onShotDataReceived(const OpenConnectV1::ShotData& shotData) override {
         std::cout << "Received ShotData:\n"
@@ -37,7 +37,7 @@ public:
         this->server.setListener(listener);
 
         std::thread serverThread([&]() {
-            this->server.startup();
+            this->server.startup(921);
         });
 
         // Main loop for user input

@@ -28,10 +28,10 @@ namespace OpenConnectV1 {
 
     class Server {
     public:
-        Server(int port);
+        Server();
         ~Server();
 
-        void startup();
+        void startup(int port);
         void shutdown();
         void sendResponse(OpenConnectV1::Response& response);
 

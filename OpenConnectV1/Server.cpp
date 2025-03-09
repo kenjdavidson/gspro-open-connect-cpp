@@ -4,8 +4,8 @@
 #include "Logger.h"
 
 namespace OpenConnectV1 {
-    Server::Server(int port)
-        : port(port), connectionStatus(ServerStatus::Disconnected), shutdownRequested(false),
+    Server::Server()
+        : connectionStatus(ServerStatus::Disconnected), shutdownRequested(false),
         serverAddress{}, clientAddress{}, serverListener(nullptr),
         clientSocket(std::make_shared<SOCKET>(INVALID_SOCKET)) {
 
@@ -28,7 +28,9 @@ namespace OpenConnectV1 {
         return this->connectionStatus.load();
     }
 
-    void Server::startup() {
+    void Server::startup(int port) {
+        this->port = port;
+
         try {
             initializeSocket();
             bindSocket();

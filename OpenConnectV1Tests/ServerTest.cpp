@@ -21,8 +21,8 @@ protected:
 
     void SetUp() override {
         // Start server in a separate thread
-        server = new OpenConnectV1::Server(TEST_PORT);
-        serverThread = std::thread([this] { server->startup(); });
+        server = new OpenConnectV1::Server();
+        serverThread = std::thread([this] { server->startup(TEST_PORT); });
 
         // Allow server to start up
         std::this_thread::sleep_for(std::chrono::seconds(1));
