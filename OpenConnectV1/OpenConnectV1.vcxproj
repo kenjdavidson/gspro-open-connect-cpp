@@ -94,7 +94,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /I "$(ProjectDir)include\*.h" "$(SolutionDir)Build\$(Configuration)\include\"</Command>
+      <Command>xcopy /Y /I "$(ProjectDir)*.h" "$(SolutionDir)Build\$(Configuration)\include\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
